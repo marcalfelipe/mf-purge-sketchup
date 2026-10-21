@@ -7,10 +7,10 @@
     <Nullable>enable</Nullable>
     <AssemblyName>MF Purge SketchUp</AssemblyName>
     <RootNamespace>MFPurgeSketchUp</RootNamespace>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0</InformationalVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1.0</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Product>MF Purge SketchUp</Product>
     <Authors>MF Purge SketchUp contributors</Authors>
@@ -20,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="assets\mf_purge_icon.png" LogicalName="MFPurgeSketchUp.mf_purge_icon.png" />
     <EmbeddedResource Include="embedded_runtime.zip" LogicalName="MFPurgeSketchUp.embedded_runtime.zip" Condition="Exists('embedded_runtime.zip')" />
     <Content Include="worker_onedir_console\MFPurgeWorkerConsole\**\*" Condition="'$(PublishSingleFile)' != 'true'">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

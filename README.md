@@ -4,7 +4,7 @@
 
 # MF Purge SketchUp
 
-[![Version](https://img.shields.io/badge/version-1.0.0-d9292f)](https://github.com/marcalfelipe/mf-purge-sketchup/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-d9292f)](https://github.com/marcalfelipe/mf-purge-sketchup/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078d4)](#requirements)
 [![License: MIT](https://img.shields.io/badge/source-MIT-34a853)](LICENSE)
 
@@ -17,7 +17,8 @@ beside it and validated by reopening it through the SketchUp C API.
 
 ![MF Purge SketchUp interface preview](docs/images/app-preview.png)
 
-*Illustrative interface preview. File names and processing results are simulated.*
+*The v1.1 interface follows this layout. File names and processing results shown
+in the preview are simulated.*
 
 ## Quick start
 
@@ -26,12 +27,12 @@ beside it and validated by reopening it through the SketchUp C API.
 1. Open the [latest release](https://github.com/marcalfelipe/mf-purge-sketchup/releases/latest).
 2. Under **Assets**, download the portable `.exe` or the `.zip` package.
 3. If you downloaded the ZIP, extract it first.
-4. Run `MF-Purge-SketchUp-v1.0.0-Windows-x64.exe`.
+4. Run `MF-Purge-SketchUp-v1.1.0-Windows-x64.exe`.
 
 Available packages:
 
-- `MF-Purge-SketchUp-v1.0.0-Windows-x64.exe` — portable single executable.
-- `MF-Purge-SketchUp-v1.0.0-Windows-x64.zip` — the same portable app in a ZIP.
+- `MF-Purge-SketchUp-v1.1.0-Windows-x64.exe` — portable single executable.
+- `MF-Purge-SketchUp-v1.1.0-Windows-x64.zip` — the same portable app in a ZIP.
 
 No installer is required. Windows SmartScreen may warn about an unsigned
 community executable; review this repository and the published SHA-256 checksum
@@ -41,10 +42,10 @@ before running it.
 
 ```powershell
 Invoke-WebRequest `
-  -Uri "https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.0.0/MF-Purge-SketchUp-v1.0.0-Windows-x64.exe" `
-  -OutFile "MF-Purge-SketchUp-v1.0.0-Windows-x64.exe"
+  -Uri "https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.1.0/MF-Purge-SketchUp-v1.1.0-Windows-x64.exe" `
+  -OutFile "MF-Purge-SketchUp-v1.1.0-Windows-x64.exe"
 
-.\MF-Purge-SketchUp-v1.0.0-Windows-x64.exe
+.\MF-Purge-SketchUp-v1.1.0-Windows-x64.exe
 ```
 
 ### Download with Git Bash, Linux shell or WSL
@@ -54,8 +55,8 @@ another shell with:
 
 ```bash
 curl -L \
-  -o MF-Purge-SketchUp-v1.0.0-Windows-x64.exe \
-  https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.0.0/MF-Purge-SketchUp-v1.0.0-Windows-x64.exe
+  -o MF-Purge-SketchUp-v1.1.0-Windows-x64.exe \
+  https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.1.0/MF-Purge-SketchUp-v1.1.0-Windows-x64.exe
 ```
 
 ### Verify the download
@@ -63,7 +64,7 @@ curl -L \
 Compare the result with the published `SHA256SUMS.txt` file:
 
 ```powershell
-Get-FileHash .\MF-Purge-SketchUp-v1.0.0-Windows-x64.exe -Algorithm SHA256
+Get-FileHash .\MF-Purge-SketchUp-v1.1.0-Windows-x64.exe -Algorithm SHA256
 ```
 
 ## How to use
@@ -94,7 +95,7 @@ The original model remains untouched.
 - Enough free disk space for the input model, temporary output and final copy.
 - SketchUp itself is **not** required for the portable release.
 
-The bundled v1.0.0 runtime is based on the SketchUp 2026 C API. Newer model
+The bundled v1.1.0 runtime is based on the SketchUp 2026 C API. Newer model
 formats may require a future release using a newer SDK.
 
 ## Safe behavior

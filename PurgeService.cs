@@ -133,6 +133,7 @@ internal static class PurgeService
         IProgress<ProgressoPurge>? progresso)
     {
         var cpuAnterior = TimeSpan.Zero;
+        var instanteAnterior = DateTime.UtcNow;
         var ultimaAtividade = DateTime.UtcNow;
         var ultimoRegistro = DateTime.MinValue;
 
@@ -146,9 +147,14 @@ internal static class PurgeService
             {
                 processo.Refresh();
                 var cpuAtual = processo.TotalProcessorTime;
+                var agora = DateTime.UtcNow;
+                var intervalo = Math.Max((agora - instanteAnterior).TotalSeconds, 0.001);
+                var cpuPercentual = (cpuAtual - cpuAnterior).TotalSeconds /
+                    (intervalo * Environment.ProcessorCount) * 100;
                 if (cpuAtual - cpuAnterior >= TimeSpan.FromMilliseconds(20))
                     ultimaAtividade = DateTime.UtcNow;
                 cpuAnterior = cpuAtual;
+                instanteAnterior = agora;
 
                 var inativo = DateTime.UtcNow - ultimaAtividade;
                 var ramGb = processo.WorkingSet64 / 1024d / 1024d / 1024d;
@@ -162,7 +168,9 @@ internal static class PurgeService
                     atividade,
                     atividade,
                     true,
-                    registrar));
+                    registrar,
+                    cpuPercentual,
+                    ramGb));
                 if (registrar)
                     ultimoRegistro = DateTime.UtcNow;
             }
@@ -197,7 +205,9 @@ internal sealed record ProgressoPurge(
     string Mensagem,
     string Atividade,
     bool ApenasAtividade,
-    bool RegistrarNoLog);
+    bool RegistrarNoLog,
+    double? CpuPercentual = null,
+    double? RamGb = null);
 
 internal sealed record ResultadoPurge(
     string Saida,

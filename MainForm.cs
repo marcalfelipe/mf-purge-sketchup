@@ -2,18 +2,35 @@ namespace MFPurgeSketchUp;
 
 internal sealed class MainForm : Form
 {
+    private static readonly Color AccentRed = Color.FromArgb(231, 45, 55);
+    private static readonly Color HeaderBlue = Color.FromArgb(226, 244, 251);
+    private static readonly Color PageBackground = Color.FromArgb(238, 246, 251);
+    private static readonly Color CardBorder = Color.FromArgb(211, 222, 230);
+    private static readonly Color DarkText = Color.FromArgb(24, 38, 56);
+    private static readonly Color MutedText = Color.FromArgb(70, 82, 94);
+
+    private readonly RoundedPanel _headerCard = new() { BackColor = HeaderBlue, BorderColor = Color.FromArgb(209, 228, 237), CornerRadius = 14 };
+    private readonly RoundedPanel _actionCard = new() { BackColor = Color.White, BorderColor = CardBorder, CornerRadius = 12 };
+    private readonly RoundedPanel _logCard = new() { BackColor = Color.White, BorderColor = CardBorder, CornerRadius = 12 };
+    private readonly Panel _logHeader = new() { BackColor = Color.FromArgb(235, 241, 246) };
+    private readonly PictureBox _logo = new();
     private readonly Label _titulo = new();
-    private readonly Label _descricao = new();
     private readonly Label _tituloLog = new();
     private readonly ComboBox _idioma = new();
     private readonly TextBox _arquivo = new();
-    private readonly Button _selecionar = new();
-    private readonly Button _purgar = new();
+    private readonly RoundedButton _selecionar = new();
+    private readonly RoundedButton _purgar = new();
     private readonly Label _status = new();
-    private readonly ProgressBar _progresso = new();
+    private readonly SmoothProgressBar _progresso = new();
     private readonly Label _percentual = new();
     private readonly Label _atividade = new();
     private readonly TextBox _log = new();
+    private readonly Label _cpuLabel = new() { Text = "CPU", AutoSize = true };
+    private readonly Label _cpuValor = new() { Text = "0%", AutoSize = true };
+    private readonly Label _ramLabel = new() { Text = "RAM", AutoSize = true };
+    private readonly Label _ramValor = new() { Text = "0%", AutoSize = true };
+    private readonly SmoothProgressBar _cpuBar = new() { FillColor = Color.FromArgb(39, 139, 235), CornerRadius = 6 };
+    private readonly SmoothProgressBar _ramBar = new() { FillColor = Color.FromArgb(39, 139, 235), CornerRadius = 6 };
     private readonly System.Windows.Forms.Timer _relogio = new() { Interval = 1000 };
     private DateTime _inicioProcessamento;
     private bool _processando;
@@ -33,129 +50,172 @@ internal sealed class MainForm : Form
     public MainForm(string? arquivoInicial)
     {
         Text = "MF Purge SketchUp";
-        ClientSize = new Size(760, 620);
-        MinimumSize = new Size(680, 550);
+        ClientSize = new Size(1040, 680);
+        MinimumSize = new Size(900, 620);
         StartPosition = FormStartPosition.CenterScreen;
         Font = new Font("Segoe UI", 10F);
-        BackColor = Color.FromArgb(245, 247, 248);
+        BackColor = PageBackground;
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? SystemIcons.Application;
         AllowDrop = true;
 
-        var header = new Panel
-        {
-            Dock = DockStyle.Top,
-            Height = 102,
-            BackColor = Color.FromArgb(237, 246, 249)
-        };
+        ConfigurarCabecalho();
+        ConfigurarAcao();
+        ConfigurarLog();
+        ConfigurarRodape();
 
-        var logo = new PictureBox
-        {
-            Image = Icon.ToBitmap(),
-            SizeMode = PictureBoxSizeMode.Zoom,
-            Location = new Point(26, 18),
-            Size = new Size(64, 64),
-            TabStop = false
-        };
+        Controls.AddRange([_headerCard, _actionCard, _logCard, _cpuLabel, _cpuBar,
+            _cpuValor, _ramLabel, _ramBar, _ramValor, _atividade]);
 
-        _titulo.Font = new Font("Segoe UI Semibold", 18F);
-        _titulo.AutoSize = true;
-        _titulo.ForeColor = Color.FromArgb(152, 24, 31);
-        _titulo.Location = new Point(104, 18);
-
-        _descricao.AutoSize = true;
-        _descricao.ForeColor = Color.FromArgb(73, 79, 83);
-        _descricao.Location = new Point(107, 54);
-
-        _idioma.DropDownStyle = ComboBoxStyle.DropDownList;
-        _idioma.Items.AddRange(["English", "Português", "Español", "Deutsch", "Français", "Русский", "Tiếng Việt", "中文"]);
-        _idioma.Location = new Point(610, 25);
-        _idioma.Size = new Size(122, 30);
-        _idioma.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        _idioma.SelectedIndexChanged += (_, _) => AplicarIdioma();
-        _idioma.SelectedIndex = 0;
-
-        header.Controls.AddRange([logo, _titulo, _descricao, _idioma]);
-
-        _arquivo.Location = new Point(34, 120);
-        _arquivo.Size = new Size(565, 30);
-        _arquivo.ReadOnly = true;
-        _arquivo.BackColor = Color.White;
-        _arquivo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-        _selecionar.Location = new Point(610, 118);
-        _selecionar.Size = new Size(115, 34);
-        _selecionar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        _selecionar.FlatStyle = FlatStyle.Flat;
-        _selecionar.FlatAppearance.BorderColor = Color.FromArgb(210, 178, 181);
-        _selecionar.BackColor = Color.White;
-        _selecionar.ForeColor = Color.FromArgb(125, 25, 32);
-        _selecionar.Cursor = Cursors.Hand;
-        _selecionar.Click += (_, _) => SelecionarArquivo();
-
-        _purgar.Location = new Point(34, 172);
-        _purgar.Size = new Size(160, 42);
-        _purgar.FlatStyle = FlatStyle.Flat;
-        _purgar.FlatAppearance.BorderSize = 0;
-        _purgar.BackColor = Color.FromArgb(205, 43, 51);
-        _purgar.ForeColor = Color.White;
-        _purgar.Font = new Font("Segoe UI Semibold", 10F);
-        _purgar.Cursor = Cursors.Hand;
-        _purgar.Enabled = false;
-        _purgar.Click += async (_, _) => await ExecutarPurgeAsync();
-
-        _progresso.Location = new Point(211, 181);
-        _progresso.Size = new Size(464, 23);
-        _progresso.Style = ProgressBarStyle.Continuous;
-        _progresso.Visible = false;
-        _progresso.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-        _percentual.Location = new Point(685, 181);
-        _percentual.Size = new Size(42, 23);
-        _percentual.TextAlign = ContentAlignment.MiddleRight;
-        _percentual.Visible = false;
-        _percentual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-
-        _status.Location = new Point(34, 230);
-        _status.Size = new Size(693, 42);
-        _status.ForeColor = Color.FromArgb(75, 75, 75);
-        _status.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-        _atividade.Location = new Point(34, 271);
-        _atividade.Size = new Size(693, 24);
-        _atividade.ForeColor = Color.FromArgb(75, 75, 75);
-        _atividade.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-        _tituloLog.AutoSize = true;
-        _tituloLog.Font = new Font("Segoe UI Semibold", 10F);
-        _tituloLog.ForeColor = Color.FromArgb(91, 30, 35);
-        _tituloLog.Location = new Point(34, 307);
-
-        _log.Location = new Point(34, 334);
-        _log.Size = new Size(693, 250);
-        _log.Multiline = true;
-        _log.ReadOnly = true;
-        _log.ScrollBars = ScrollBars.Vertical;
-        _log.BackColor = Color.White;
-        _log.Font = new Font("Consolas", 9F);
-        _log.BorderStyle = BorderStyle.FixedSingle;
-        _log.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-
+        Resize += (_, _) => OrganizarInterface();
+        DragEnter += AoArrastar;
+        DragDrop += AoSoltar;
         _relogio.Tick += (_, _) =>
         {
             if (_inicioProcessamento != default)
                 _atividade.Text = Localizer.T(Language, "elapsed", FormatarTempo(DateTime.Now - _inicioProcessamento), _atividade.Tag ?? "");
         };
 
-        Controls.AddRange([header, _arquivo, _selecionar, _purgar, _progresso,
-            _percentual, _status, _atividade, _tituloLog, _log]);
-
-        DragEnter += AoArrastar;
-        DragDrop += AoSoltar;
-
+        _idioma.SelectedIndex = 0;
         AplicarIdioma();
+        OrganizarInterface();
 
         if (!string.IsNullOrWhiteSpace(arquivoInicial))
             DefinirArquivo(arquivoInicial);
+    }
+
+    private void ConfigurarCabecalho()
+    {
+        using var logoStream = typeof(MainForm).Assembly.GetManifestResourceStream("MFPurgeSketchUp.mf_purge_icon.png");
+        if (logoStream is not null)
+        {
+            using var logoOriginal = Image.FromStream(logoStream);
+            _logo.Image = new Bitmap(logoOriginal);
+        }
+        else
+        {
+            _logo.Image = Icon?.ToBitmap();
+        }
+        _logo.SizeMode = PictureBoxSizeMode.Zoom;
+        _logo.TabStop = false;
+
+        _titulo.Font = new Font("Segoe UI Semibold", 26F);
+        _titulo.AutoSize = true;
+        _titulo.ForeColor = DarkText;
+
+        _idioma.DropDownStyle = ComboBoxStyle.DropDownList;
+        _idioma.Items.AddRange(["English", "Português", "Español", "Deutsch", "Français", "Русский", "Tiếng Việt", "中文"]);
+        _idioma.Font = new Font("Segoe UI", 11F);
+        _idioma.SelectedIndexChanged += (_, _) => AplicarIdioma();
+
+        _headerCard.Controls.AddRange([_logo, _titulo, _idioma]);
+    }
+
+    private void ConfigurarAcao()
+    {
+        _arquivo.ReadOnly = true;
+        _arquivo.BackColor = Color.White;
+        _arquivo.BorderStyle = BorderStyle.FixedSingle;
+        _arquivo.Font = new Font("Segoe UI", 11F);
+
+        _selecionar.BackColor = Color.FromArgb(246, 249, 251);
+        _selecionar.ForeColor = DarkText;
+        _selecionar.Font = new Font("Segoe UI", 11F);
+        _selecionar.Cursor = Cursors.Hand;
+        _selecionar.Click += (_, _) => SelecionarArquivo();
+
+        _purgar.BackColor = AccentRed;
+        _purgar.ForeColor = Color.White;
+        _purgar.Font = new Font("Segoe UI Semibold", 12F);
+        _purgar.Cursor = Cursors.Hand;
+        _purgar.Enabled = false;
+        _purgar.Click += async (_, _) => await ExecutarPurgeAsync();
+
+        _progresso.FillColor = Color.FromArgb(39, 177, 83);
+        _progresso.Value = 0;
+
+        _percentual.Font = new Font("Segoe UI Semibold", 11F);
+        _percentual.ForeColor = DarkText;
+        _percentual.Text = "0%";
+        _percentual.TextAlign = ContentAlignment.MiddleRight;
+
+        _status.ForeColor = DarkText;
+        _status.Font = new Font("Segoe UI", 10.5F);
+        _status.AutoEllipsis = true;
+
+        _actionCard.Controls.AddRange([_arquivo, _selecionar, _purgar, _progresso, _percentual, _status]);
+    }
+
+    private void ConfigurarLog()
+    {
+        _tituloLog.Font = new Font("Segoe UI Semibold", 11F);
+        _tituloLog.ForeColor = DarkText;
+        _tituloLog.AutoSize = true;
+
+        _log.Multiline = true;
+        _log.ReadOnly = true;
+        _log.ScrollBars = ScrollBars.Vertical;
+        _log.BackColor = Color.White;
+        _log.ForeColor = DarkText;
+        _log.Font = new Font("Consolas", 9.5F);
+        _log.BorderStyle = BorderStyle.None;
+
+        _logHeader.Controls.Add(_tituloLog);
+        _logCard.Controls.AddRange([_logHeader, _log]);
+    }
+
+    private void ConfigurarRodape()
+    {
+        foreach (var label in new[] { _cpuLabel, _cpuValor, _ramLabel, _ramValor })
+        {
+            label.Font = new Font("Segoe UI Semibold", 10F);
+            label.ForeColor = DarkText;
+        }
+
+        _atividade.ForeColor = MutedText;
+        _atividade.Font = new Font("Segoe UI", 9.5F);
+        _atividade.TextAlign = ContentAlignment.MiddleRight;
+        _atividade.AutoEllipsis = true;
+    }
+
+    private void OrganizarInterface()
+    {
+        const int margin = 22;
+        var contentWidth = ClientSize.Width - margin * 2;
+        var footerTop = ClientSize.Height - 51;
+        const int logTop = 375;
+        var logHeight = Math.Max(190, footerTop - logTop - 14);
+
+        _headerCard.SetBounds(margin, 18, contentWidth, 140);
+        _logo.SetBounds(34, 25, 88, 88);
+        _titulo.Location = new Point(145, 47);
+        _idioma.SetBounds(Math.Max(650, contentWidth - 230), 50, 190, 34);
+
+        _actionCard.SetBounds(margin, 174, contentWidth, 185);
+        var innerWidth = contentWidth - 48;
+        var runWidth = Math.Min(240, Math.Max(205, innerWidth / 4));
+        const int selectWidth = 140;
+        const int gap = 14;
+        var fileWidth = innerWidth - runWidth - selectWidth - gap * 2;
+        _arquivo.SetBounds(24, 24, fileWidth, 38);
+        _selecionar.SetBounds(24 + fileWidth + gap, 20, selectWidth, 46);
+        _purgar.SetBounds(24 + fileWidth + gap + selectWidth + gap, 20, runWidth, 46);
+        _progresso.SetBounds(24, 93, innerWidth - 70, 20);
+        _percentual.SetBounds(contentWidth - 67, 85, 43, 34);
+        _status.SetBounds(24, 132, innerWidth, 30);
+
+        _logCard.SetBounds(margin, logTop, contentWidth, logHeight);
+        _logHeader.SetBounds(1, 1, contentWidth - 2, 48);
+        _tituloLog.Location = new Point(23, 13);
+        _log.SetBounds(24, 61, contentWidth - 48, logHeight - 78);
+
+        var metricsY = footerTop + 9;
+        _cpuLabel.Location = new Point(margin + 28, metricsY + 3);
+        _cpuBar.SetBounds(margin + 76, metricsY + 5, 150, 16);
+        _cpuValor.Location = new Point(margin + 237, metricsY + 2);
+        _ramLabel.Location = new Point(margin + 305, metricsY + 3);
+        _ramBar.SetBounds(margin + 358, metricsY + 5, 150, 16);
+        _ramValor.Location = new Point(margin + 519, metricsY + 2);
+        _atividade.SetBounds(margin + 580, metricsY - 2, Math.Max(100, contentWidth - 580), 28);
     }
 
     private void SelecionarArquivo()
@@ -229,11 +289,7 @@ internal sealed class MainForm : Form
         try
         {
             var resultado = await PurgeService.ExecutarAsync(entrada, Language, progresso);
-            _status.Text = Localizer.T(
-                Language,
-                "done_status",
-                resultado.ComponentesRemovidos,
-                resultado.MateriaisRemovidos);
+            _status.Text = Localizer.T(Language, "done_status", resultado.ComponentesRemovidos, resultado.MateriaisRemovidos);
 
             var preservadas = resultado.DefinicoesPreservadas.Count > 0
                 ? Localizer.T(
@@ -275,8 +331,24 @@ internal sealed class MainForm : Form
     {
         if (progresso.Percentual is int percentual)
         {
-            _progresso.Value = Math.Clamp(percentual, 0, 100);
+            _progresso.Value = percentual;
             _percentual.Text = $"{percentual}%";
+        }
+
+        if (progresso.CpuPercentual is double cpu)
+        {
+            var cpuInteira = (int)Math.Round(Math.Clamp(cpu, 0, 100));
+            _cpuBar.Value = cpuInteira;
+            _cpuValor.Text = $"{cpuInteira}%";
+        }
+
+        if (progresso.RamGb is double ramGb)
+        {
+            var totalDisponivel = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024d / 1024d / 1024d;
+            var ramPercentual = totalDisponivel > 0 ? (int)Math.Round(ramGb / totalDisponivel * 100) : 0;
+            ramPercentual = Math.Clamp(ramPercentual, 0, 100);
+            _ramBar.Value = ramPercentual;
+            _ramValor.Text = $"{ramPercentual}%";
         }
 
         _atividade.Tag = progresso.Atividade;
@@ -300,9 +372,8 @@ internal sealed class MainForm : Form
     private void AplicarIdioma()
     {
         _titulo.Text = Localizer.T(Language, "title");
-        _descricao.Text = Localizer.T(Language, "description");
         _selecionar.Text = Localizer.T(Language, "select");
-        _purgar.Text = Localizer.T(Language, "purge");
+        _purgar.Text = $"▶  {Localizer.T(Language, "purge")}";
         _tituloLog.Text = Localizer.T(Language, "log");
 
         if (File.Exists(_arquivo.Text))
@@ -314,6 +385,8 @@ internal sealed class MainForm : Form
         else
         {
             _status.Text = Localizer.T(Language, "none");
+            if (!_processando)
+                _atividade.Text = Localizer.T(Language, "ready");
         }
     }
 
@@ -325,12 +398,14 @@ internal sealed class MainForm : Form
         _idioma.Enabled = !processando;
         _purgar.Enabled = !processando && File.Exists(_arquivo.Text);
         AllowDrop = !processando;
-        _progresso.Visible = processando;
-        _percentual.Visible = processando;
         if (processando)
         {
             _progresso.Value = 0;
             _percentual.Text = "0%";
+            _cpuBar.Value = 0;
+            _cpuValor.Text = "0%";
+            _ramBar.Value = 0;
+            _ramValor.Text = "0%";
         }
     }
 }

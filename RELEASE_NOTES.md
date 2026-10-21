@@ -1,6 +1,16 @@
-# MF Purge SketchUp v1.0.0
+# MF Purge SketchUp v1.1.0
 
-First public community release.
+This release brings the real Windows interface in line with the visual preview
+published in the project README.
+
+## What changed
+
+- New landscape layout with rounded header and content cards.
+- High-resolution app artwork in the window header.
+- Large red purge action, smooth progress bar and clearer percentage display.
+- Dedicated processing-log card.
+- Live CPU and RAM percentage bars.
+- Existing purge behavior, output validation and eight languages are preserved.
 
 ## Download choices
 
@@ -15,7 +25,7 @@ First public community release.
 Compare the downloaded executable against `SHA256SUMS.txt`:
 
 ```powershell
-Get-FileHash '.\MF-Purge-SketchUp-v1.0.0-Windows-x64.exe' -Algorithm SHA256
+Get-FileHash '.\MF-Purge-SketchUp-v1.1.0-Windows-x64.exe' -Algorithm SHA256
 ```
 
 ## Important
