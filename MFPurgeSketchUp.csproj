@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>MF Purge SketchUp</AssemblyName>
+    <RootNamespace>MFPurgeSketchUp</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>MF Purge SketchUp</Product>
+    <Authors>MF Purge SketchUp contributors</Authors>
+    <Description>Remove unused SketchUp components and materials without opening SketchUp.</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>assets\mf_purge.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="embedded_runtime.zip" LogicalName="MFPurgeSketchUp.embedded_runtime.zip" Condition="Exists('embedded_runtime.zip')" />
+    <Content Include="worker_onedir_console\MFPurgeWorkerConsole\**\*" Condition="'$(PublishSingleFile)' != 'true'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>worker\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="sketchup_runtime\*.dll" Condition="'$(PublishSingleFile)' != 'true'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>worker\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+</Project>

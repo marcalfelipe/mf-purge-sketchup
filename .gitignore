@@ -1,0 +1,34 @@
+# Build outputs
+bin/
+obj/
+dist/
+artifacts/
+embedded_runtime.zip
+
+# Local toolchains and caches
+.appdata/
+.build-tools/
+.dotnet-home/
+.nuget-packages/
+.venv/
+.pyinstaller-build*/
+worker_dist/
+worker_onedir*/
+
+# Proprietary/local runtime files
+sketchup_runtime/
+
+# Test models, backups and diagnostics
+*.skp
+*.skb
+diag_*.json
+real_test_output/
+test_artifacts/
+
+# IDE and OS files
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
+.DS_Store
