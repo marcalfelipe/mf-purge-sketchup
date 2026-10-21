@@ -15,10 +15,20 @@ for models that are too heavy to load reliably in the desktop application.
 The original file is never overwritten. A new `*_PURGADO.skp` file is created
 beside it and validated by reopening it through the SketchUp C API.
 
-## Download
+![MF Purge SketchUp interface preview](docs/images/app-preview.png)
 
-Open the [latest release](https://github.com/marcalfelipe/mf-purge-sketchup/releases/latest)
-and choose either:
+*Illustrative interface preview. File names and processing results are simulated.*
+
+## Quick start
+
+### Download in your browser
+
+1. Open the [latest release](https://github.com/marcalfelipe/mf-purge-sketchup/releases/latest).
+2. Under **Assets**, download the portable `.exe` or the `.zip` package.
+3. If you downloaded the ZIP, extract it first.
+4. Run `MF-Purge-SketchUp-v1.0.0-Windows-x64.exe`.
+
+Available packages:
 
 - `MF-Purge-SketchUp-v1.0.0-Windows-x64.exe` — portable single executable.
 - `MF-Purge-SketchUp-v1.0.0-Windows-x64.zip` — the same portable app in a ZIP.
@@ -26,6 +36,44 @@ and choose either:
 No installer is required. Windows SmartScreen may warn about an unsigned
 community executable; review this repository and the published SHA-256 checksum
 before running it.
+
+### Download with PowerShell
+
+```powershell
+Invoke-WebRequest `
+  -Uri "https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.0.0/MF-Purge-SketchUp-v1.0.0-Windows-x64.exe" `
+  -OutFile "MF-Purge-SketchUp-v1.0.0-Windows-x64.exe"
+
+.\MF-Purge-SketchUp-v1.0.0-Windows-x64.exe
+```
+
+### Download with Git Bash, Linux shell or WSL
+
+The executable is for Windows, but it can be downloaded from Git Bash, WSL or
+another shell with:
+
+```bash
+curl -L \
+  -o MF-Purge-SketchUp-v1.0.0-Windows-x64.exe \
+  https://github.com/marcalfelipe/mf-purge-sketchup/releases/download/v1.0.0/MF-Purge-SketchUp-v1.0.0-Windows-x64.exe
+```
+
+### Verify the download
+
+Compare the result with the published `SHA256SUMS.txt` file:
+
+```powershell
+Get-FileHash .\MF-Purge-SketchUp-v1.0.0-Windows-x64.exe -Algorithm SHA256
+```
+
+## How to use
+
+1. Open the portable executable.
+2. Drag a `.skp` model onto the window or choose it with **Select**.
+3. Click **Run purge** and follow the live log and progress bar.
+4. When validation finishes, open the new `*_PURGADO.skp` copy and inspect it.
+
+The original model remains untouched.
 
 ## Features
 
@@ -65,6 +113,19 @@ The complete C# interface/localization source and Python purge worker are in
 this repository. See [Building from source](docs/BUILDING.md) for the toolchain,
 SDK files and packaging command.
 
+Clone the source with Git or Git Bash:
+
+```bash
+git clone https://github.com/marcalfelipe/mf-purge-sketchup.git
+cd mf-purge-sketchup
+```
+
+Or with the GitHub CLI:
+
+```bash
+gh repo clone marcalfelipe/mf-purge-sketchup
+```
+
 The repository intentionally excludes test models, local caches, compiled
 workers and proprietary SketchUp SDK binaries. Release executables include the
 runtime files required by the official C API release guidance.
@@ -98,7 +159,21 @@ O MF Purge SketchUp limpa componentes, grupos, materiais e texturas não usados
 diretamente de um arquivo `.skp`, antes de abrir o SketchUp. O original nunca é
 sobrescrito: o programa cria e valida uma nova cópia `*_PURGADO.skp`.
 
-Baixe o executável portátil ou o ZIP na página de
-[Releases](https://github.com/marcalfelipe/mf-purge-sketchup/releases/latest).
+### Como baixar e usar
+
+1. Abra a página da [versão mais recente](https://github.com/marcalfelipe/mf-purge-sketchup/releases/latest).
+2. Expanda **Assets** e baixe o arquivo `.exe` portátil ou o pacote `.zip`.
+3. Abra o aplicativo, arraste uma cópia do modelo `.skp` para a janela e clique
+   em **Run purge** — ou altere o idioma para português.
+4. Acompanhe o log e aguarde a validação do novo arquivo `*_PURGADO.skp`.
+
 O SketchUp não precisa estar instalado. O código-fonte completo está disponível
-para estudo e colaboração, respeitando os termos separados da API da Trimble.
+para estudo e colaboração. Para baixá-lo pelo Git Bash:
+
+```bash
+git clone https://github.com/marcalfelipe/mf-purge-sketchup.git
+cd mf-purge-sketchup
+```
+
+As dependências oficiais da API permanecem sujeitas aos termos separados da
+Trimble.
